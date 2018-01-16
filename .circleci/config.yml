@@ -1,3 +1,22 @@
+build_push: &build_push
+  steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build Docker Image
+        command: |
+          docker build -t $DOCKER_REPO:$CIRCLE_BRANCH -f py$PY_VERSION/Dockerfile .
+    - run:
+        name: Push to Docker Hub
+        command: |
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+            docker_v=$(grep 'ENV DOCKER_VERSION' py$PY_VERSION/Dockerfile | awk '{ print $3 }' | cut -d '~' -f1)
+            tag="16.04-py${PY_VERSION}-docker-ce-${docker_v}"
+            docker tag $DOCKER_REPO:$CIRCLE_BRANCH $DOCKER_REPO:$tag
+            docker push $DOCKER_REPO:$tag
+          fi
+
 version: 2
 jobs:
   py2:
@@ -5,45 +24,15 @@ jobs:
       - image: docker:17.12.0-ce-git
     environment:
       - DOCKER_REPO: thomasjpfan/ubuntu-docker-ce-systemd
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build Docker image
-          command: |
-            docker build -t $DOCKER_REPO:$CIRCLE_BRANCH -f py2/Dockerfile .
-      - run:
-          name: Push to Docker Hub
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
-              docker_v=$(grep 'ENV DOCKER_VERSION' py2/Dockerfile | awk '{ print $3 }' | cut -d '~' -f1)
-              tag="16.04-py2-docker-ce-${docker_v}"
-              docker tag $DOCKER_REPO:$CIRCLE_BRANCH $DOCKER_REPO:$tag
-              docker push $DOCKER_REPO:$tag
-            fi
+      - PY_VERSION: 2
+    <<: *build_push
+
   py3:
     docker:
       - image: docker:17.12.0-ce-git
     environment:
       - DOCKER_REPO: thomasjpfan/ubuntu-docker-ce-systemd
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build Docker image
-          command: |
-            docker build -t $DOCKER_REPO:$CIRCLE_BRANCH -f py3/Dockerfile .
-      - run:
-          name: Push to Docker Hub
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
-              docker_v=$(grep 'ENV DOCKER_VERSION' py3/Dockerfile | awk '{ print $3 }' | cut -d '~' -f1)
-              tag="16.04-py3-docker-ce-${docker_v}"
-              docker tag $DOCKER_REPO:$CIRCLE_BRANCH $DOCKER_REPO:$tag
-              docker push $DOCKER_REPO:$tag
-            fi
+    <<: *build_push
 
 workflows:
   version: 2
