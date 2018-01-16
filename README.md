@@ -1,5 +1,7 @@
 # Ubuntu Docker-CE Systemd
 
+[![CircleCI](https://circleci.com/gh/thomasjpfan/ubuntu-docker-ce-systemd/tree/master.svg?style=svg)](https://circleci.com/gh/thomasjpfan/ubuntu-docker-ce-systemd/tree/master)
+
 This image builds ontop of [thomasjpfan/ubuntu-python-systemd](https://github.com/thomasjpfan/ubuntu-python-systemd) to make it easier to test ansible playbooks that needs docker already installed.
 
 ## Usage
