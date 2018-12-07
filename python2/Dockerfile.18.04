@@ -1,7 +1,7 @@
 FROM thomasjpfan/ubuntu-python-systemd:18.04-py2
 
 ENV DOCKER_CHANNEL stable
-ENV DOCKER_VERSION 18.06.0~ce~3-0~ubuntu
+ENV DOCKER_VERSION 5:18.09.0~3-0~ubuntu*
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
