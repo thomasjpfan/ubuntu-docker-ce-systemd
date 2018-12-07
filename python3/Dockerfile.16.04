@@ -23,4 +23,3 @@ RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubunt
     apt-get clean
 
 COPY templates/override.conf /etc/systemd/system/containerd.service.d/override.conf
-RUN systemctl daemon-reload
